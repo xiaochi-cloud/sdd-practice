@@ -1,0 +1,109 @@
+# F001 - 用户注册
+
+meta:
+  id: F001
+  name: 用户注册
+  version: 1.0.0
+  description: 新用户注册账号
+  priority: high
+
+spec:
+  functions:
+    - id: F001-01
+      name: 创建用户账号
+      description: |
+        新用户通过邮箱和密码注册账号
+        注册成功后自动登录
+      
+      parameters:
+        - name: username
+          type: string
+          min_length: 3
+          max_length: 20
+          pattern: "^[a-zA-Z0-9_]+$"
+          required: true
+          description: 用户名（只能包含字母、数字、下划线）
+          
+        - name: email
+          type: string
+          format: email
+          required: true
+          description: 邮箱地址
+          
+        - name: password
+          type: string
+          min_length: 8
+          max_length: 32
+          required: true
+          description: 密码（必须包含大小写字母和数字）
+      
+      returns:
+        - name: user_id
+          type: string
+          format: uuid
+          description: 用户 ID
+        - name: token
+          type: string
+          description: JWT 访问令牌
+        - name: created_at
+          type: datetime
+          description: 创建时间
+      
+      errors:
+        - code: USER_EXISTS
+          description: 用户已存在
+          http_status: 409
+        - code: EMAIL_EXISTS
+          description: 邮箱已存在
+          http_status: 409
+        - code: WEAK_PASSWORD
+          description: 密码强度不足
+          http_status: 400
+        - code: INVALID_USERNAME
+          description: 用户名格式无效
+          http_status: 400
+      
+      constraints:
+        - 用户名不能重复
+        - 邮箱不能重复
+        - 密码必须加密存储
+        - 用户名 3-20 字符
+        - 密码 8-32 字符
+      
+      business_rules:
+        - id: R001
+          name: 用户名唯一性
+          description: 用户名全局唯一
+          
+        - id: R002
+          name: 邮箱唯一性
+          description: 邮箱全局唯一
+          
+        - id: R003
+          name: 密码强度
+          description: 密码必须包含大小写字母和数字
+          
+        - id: R004
+          name: 自动登录
+          description: 注册成功后自动登录并返回 Token
+      
+      acceptance_criteria:
+        - id: AC001
+          description: 有效输入能成功注册
+          test: "注册请求 → 201 Created → 返回 user_id 和 token"
+          
+        - id: AC002
+          description: 用户名重复返回错误
+          test: "重复用户名 → 409 Conflict → 错误码 USER_EXISTS"
+          
+        - id: AC003
+          description: 邮箱重复返回错误
+          test: "重复邮箱 → 409 Conflict → 错误码 EMAIL_EXISTS"
+          
+        - id: AC004
+          description: 密码强度不足返回错误
+          test: "弱密码 → 400 Bad Request → 错误码 WEAK_PASSWORD"
+          
+        - id: AC005
+          description: 用户名格式错误返回错误
+          test: "无效用户名 → 400 Bad Request → 错误码 INVALID_USERNAME"

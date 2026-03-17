@@ -1,0 +1,166 @@
+# API 接口模板
+
+> 复制此模板开始编写 API 规范
+
+**使用说明：**
+1. 复制模板到新文件
+2. 填写 meta 信息
+3. 定义 endpoints
+4. 添加 request/response 示例
+5. 定义错误码
+
+---
+
+meta:
+  name: API 名称               # API 名称（如 User API）
+  version: 1.0.0              # 规范版本
+  description: API 描述        # API 用途说明
+  base_path: /api/v1          # 基础路径
+  author: 作者名
+  created_at: 2026-03-11
+
+spec:
+  # ==================== 端点定义 ====================
+  endpoints:
+    - path: /resource/{id}    # 路径（支持路径参数）
+      method: GET             # 方法：GET/POST/PUT/DELETE/PATCH
+      name: 端点名称          # 端点名称
+      description: |          # 端点描述
+        详细描述端点用途
+      tags: [标签 1, 标签 2]   # 标签（用于分类）
+      
+      # ==================== 路径参数 ====================
+      path_params:
+        - name: id
+          type: string
+          format: uuid
+          required: true
+          description: 资源 ID
+      
+      # ==================== 查询参数 ====================
+      query_params:
+        - name: page
+          type: integer
+          default: 1
+          description: 页码
+        
+        - name: page_size
+          type: integer
+          default: 20
+          max: 100
+          description: 每页数量
+      
+      # ==================== 请求体 ====================
+      request:
+        content_type: application/json
+        body:
+          field1:
+            type: string
+            required: true
+            description: 字段 1 描述
+          field2:
+            type: integer
+            required: false
+            description: 字段 2 描述
+      
+      # ==================== 响应定义 ====================
+      response:
+        success:
+          status: 200
+          description: 成功响应
+          body:
+            field1:
+              type: string
+              description: 字段 1
+            field2:
+              type: object
+              description: 字段 2
+        
+        error:
+          status: 400
+          description: 错误响应
+          body:
+            error:
+              type: string
+              description: 错误码
+            message:
+              type: string
+              description: 错误信息
+      
+      # ==================== 错误码 ====================
+      errors:
+        - code: RESOURCE_NOT_FOUND
+          message: 资源不存在
+          http_status: 404
+        
+        - code: INVALID_INPUT
+          message: 输入无效
+          http_status: 400
+      
+      # ==================== 安全要求 ====================
+      security:
+        - bearerAuth: []      # 认证方式：bearerAuth/apiKey/basicAuth
+      
+      # ==================== 速率限制 ====================
+      rate_limit:
+        requests: 100         # 请求次数
+        period: 1m            # 时间周期
+
+# ==================== 示例 ====================
+#
+# 创建用户 API 示例：
+#
+# - path: /api/v1/users
+#   method: POST
+#   name: 创建用户
+#   description: 创建新用户账号
+#   
+#   request:
+#     content_type: application/json
+#     body:
+#       username:
+#         type: string
+#         min_length: 3
+#         max_length: 20
+#         required: true
+#         description: 用户名
+#       
+#       email:
+#         type: string
+#         format: email
+#         required: true
+#         description: 邮箱
+#       
+#       password:
+#         type: string
+#         min_length: 8
+#         required: true
+#         description: 密码
+#   
+#   response:
+#     success:
+#       status: 201
+#       body:
+#         user_id:
+#           type: string
+#           format: uuid
+#         token:
+#           type: string
+#     
+#     error:
+#       status: 400
+#       body:
+#         error: string
+#         message: string
+#   
+#   errors:
+#     - code: USER_EXISTS
+#       message: 用户已存在
+#       http_status: 409
+#     
+#     - code: INVALID_EMAIL
+#       message: 邮箱格式无效
+#       http_status: 400
+#   
+#   security:
+#     - bearerAuth: []

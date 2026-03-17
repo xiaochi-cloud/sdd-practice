@@ -1,0 +1,133 @@
+# 数据模型模板
+
+> 复制此模板开始编写数据模型规范
+
+**使用说明：**
+1. 复制模板到新文件
+2. 填写 meta 信息
+3. 定义 fields
+4. 添加 indexes 和 constraints
+
+---
+
+meta:
+  name: 模型名称               # 模型名（如 User）
+  version: 1.0.0              # 规范版本
+  description: 模型描述        # 模型用途说明
+  table: 表名                  # 数据库表名
+  author: 作者名
+  created_at: 2026-03-11
+
+spec:
+  # ==================== 字段定义 ====================
+  fields:
+    - name: 字段名
+      type: string            # 类型：string/number/boolean/enum/datetime/date/uuid
+      format: email           # 格式：email/uuid/url/phone（可选）
+      min_length: 1           # 最小长度（string）
+      max_length: 200         # 最大长度（string）
+      min_value: 0            # 最小值（number）
+      max_value: 100          # 最大值（number）
+      values: [a, b, c]       # 枚举值（enum 类型）
+      primary_key: true       # 是否主键
+      unique: true            # 是否唯一
+      required: true          # 是否必填
+      default: value          # 默认值
+      description: 字段描述
+  
+  # ==================== 索引定义 ====================
+  indexes:
+    - name: idx_字段名
+      fields: [字段名]
+      unique: true/false      # 是否唯一索引
+    
+    - name: idx_复合索引
+      fields: [字段 1, 字段 2]
+      unique: false
+  
+  # ==================== 约束定义 ====================
+  constraints:
+    - name: 约束名称
+      description: 约束描述
+      expression: 约束表达式（可选）
+  
+  # ==================== 关系定义（可选） ====================
+  relationships:
+    - type: one-to-many       # 关系类型：one-to-one/one-to-many/many-to-many
+      target: 关联模型名
+      field: 外键字段名
+      description: 关系描述
+
+# ==================== 示例 ====================
+#
+# 用户模型示例：
+#
+# meta:
+#   name: User
+#   version: 1.0.0
+#   description: 用户模型
+#   table: users
+#
+# spec:
+#   fields:
+#     - name: id
+#       type: string
+#       format: uuid
+#       primary_key: true
+#       required: true
+#       description: 用户 ID
+#     
+#     - name: username
+#       type: string
+#       min_length: 3
+#       max_length: 20
+#       unique: true
+#       required: true
+#       description: 用户名
+#     
+#     - name: email
+#       type: string
+#       format: email
+#       unique: true
+#       required: true
+#       description: 邮箱地址
+#     
+#     - name: password_hash
+#       type: string
+#       required: true
+#       description: 密码哈希
+#     
+#     - name: status
+#       type: enum
+#       values: [active, inactive, banned]
+#       default: active
+#       required: true
+#       description: 用户状态
+#     
+#     - name: created_at
+#       type: datetime
+#       default: now()
+#       required: true
+#       description: 创建时间
+#     
+#     - name: updated_at
+#       type: datetime
+#       default: now()
+#       required: true
+#       description: 更新时间
+#   
+#   indexes:
+#     - name: idx_username
+#       fields: [username]
+#       unique: true
+#     
+#     - name: idx_email
+#       fields: [email]
+#       unique: true
+#   
+#   constraints:
+#     - name: username_unique
+#       description: 用户名全局唯一
+#     
+#     - name: email_unique
+#       description: 邮箱全局唯一

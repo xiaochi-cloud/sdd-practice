@@ -1,0 +1,82 @@
+# User 模型
+
+meta:
+  name: User
+  version: 1.0.0
+  description: 用户模型
+  table: users
+
+spec:
+  fields:
+    - name: id
+      type: string
+      format: uuid
+      primary_key: true
+      required: true
+      description: 用户 ID
+      
+    - name: username
+      type: string
+      min_length: 3
+      max_length: 20
+      unique: true
+      required: true
+      description: 用户名
+      
+    - name: email
+      type: string
+      format: email
+      unique: true
+      required: true
+      description: 邮箱地址
+      
+    - name: password_hash
+      type: string
+      required: true
+      description: 密码哈希（BCrypt）
+      
+    - name: status
+      type: enum
+      values: [active, inactive, banned]
+      default: active
+      required: true
+      description: 用户状态
+      
+    - name: created_at
+      type: datetime
+      default: now()
+      required: true
+      description: 创建时间
+      
+    - name: updated_at
+      type: datetime
+      default: now()
+      required: true
+      description: 更新时间
+      
+    - name: last_login_at
+      type: datetime
+      required: false
+      description: 最后登录时间
+  
+  indexes:
+    - name: idx_username
+      fields: [username]
+      unique: true
+      
+    - name: idx_email
+      fields: [email]
+      unique: true
+      
+    - name: idx_status
+      fields: [status]
+  
+  constraints:
+    - name: username_unique
+      description: 用户名全局唯一
+      
+    - name: email_unique
+      description: 邮箱全局唯一
+      
+    - name: password_required
+      description: 密码不能为空

@@ -1,0 +1,44 @@
+# Demo Project - OpenSpec 规范
+
+meta:
+  name: Qoder Demo
+  version: 1.0.0
+  description: 演示项目 - 用户管理系统
+  author: 池少团队
+  created_at: 2026-03-11
+  language: zh-CN
+  framework: spring-boot-3
+
+spec:
+  # 功能列表
+  functions:
+    - id: F001
+      name: 用户注册
+      description: 新用户注册账号
+      
+    - id: F002
+      name: 用户登录
+      description: 用户登录系统
+      
+    - id: F003
+      name: 用户信息
+      description: 查看和更新用户信息
+  
+  # 数据模型
+  models:
+    - name: User
+      description: 用户模型
+  
+  # API 接口
+  apis:
+    - path: /api/users
+      method: POST
+      name: 创建用户
+      
+    - path: /api/users/login
+      method: POST
+      name: 用户登录
+      
+    - path: /api/users/{id}
+      method: GET
+      name: 获取用户信息

@@ -1,0 +1,139 @@
+# 功能规范模板
+
+> 复制此模板开始编写新功能规范
+
+**使用说明：**
+1. 复制模板到新文件
+2. 填写 meta 信息
+3. 定义 functions/parameters/returns
+4. 添加 constraints 和 business_rules
+5. 定义 acceptance_criteria
+
+---
+
+meta:
+  id: FXXX                    # 功能 ID（如 F001）
+  name: 功能名称               # 简洁的功能名称
+  version: 1.0.0              # 规范版本
+  description: |              # 功能描述（1-2 句话）
+    功能详细说明
+  priority: high              # 优先级：high/medium/low
+  author: 作者名               # 规范作者
+  created_at: 2026-03-11      # 创建日期
+
+spec:
+  functions:
+    - id: FXXX-01             # 子功能 ID
+      name: 子功能名称         # 子功能名称
+      description: |          # 子功能详细描述
+        详细描述子功能的用途和场景
+      
+      # ==================== 参数定义 ====================
+      parameters:
+        - name: 参数名
+          type: string        # 类型：string/number/boolean/enum/object/array
+          min_length: 1       # 最小长度（string）
+          max_length: 200     # 最大长度（string）
+          min_value: 0        # 最小值（number）
+          max_value: 100      # 最大值（number）
+          pattern: "^..."     # 正则表达式（string）
+          format: email       # 格式：email/uuid/date/datetime
+          values: [a, b, c]   # 枚举值（enum）
+          required: true      # 是否必填
+          default: value      # 默认值
+          description: 参数描述
+      
+      # ==================== 返回值定义 ====================
+      returns:
+        - name: 返回值名
+          type: string
+          format: uuid
+          description: 返回值描述
+      
+      # ==================== 错误定义 ====================
+      errors:
+        - code: ERROR_CODE
+          description: 错误描述
+          http_status: 400
+      
+      # ==================== 约束条件 ====================
+      constraints:
+        - 约束 1（如：参数不能为空）
+        - 约束 2（如：长度限制）
+        - 约束 3（如：格式要求）
+      
+      # ==================== 业务规则 ====================
+      business_rules:
+        - id: R001
+          name: 规则名称
+          description: 规则详细描述
+          condition: 条件表达式
+          action: 执行动作
+      
+      # ==================== 验收标准 ====================
+      acceptance_criteria:
+        - id: AC001
+          description: 验收标准描述
+          test: 测试方法或预期结果
+
+# ==================== 示例 ====================
+# 
+# 使用示例：
+# parameters:
+#   - name: username
+#     type: string
+#     min_length: 3
+#     max_length: 20
+#     pattern: "^[a-zA-Z0-9_]+$"
+#     required: true
+#     description: 用户名（只能包含字母、数字、下划线）
+#
+#   - name: email
+#     type: string
+#     format: email
+#     required: true
+#     description: 邮箱地址
+#
+#   - name: password
+#     type: string
+#     min_length: 8
+#     max_length: 32
+#     required: true
+#     description: 密码（必须包含大小写字母和数字）
+#
+# returns:
+#   - name: user_id
+#     type: string
+#     format: uuid
+#     description: 用户 ID
+#   - name: token
+#     type: string
+#     description: JWT 访问令牌
+#
+# errors:
+#   - code: USER_EXISTS
+#     description: 用户已存在
+#     http_status: 409
+#   - code: INVALID_EMAIL
+#     description: 邮箱格式无效
+#     http_status: 400
+#
+# constraints:
+#   - 用户名不能重复
+#   - 邮箱不能重复
+#   - 密码必须加密存储
+#
+# business_rules:
+#   - id: R001
+#     name: 用户名唯一性
+#     description: 用户名全局唯一
+#     condition: "username exists"
+#     action: "return error USER_EXISTS"
+#
+# acceptance_criteria:
+#   - id: AC001
+#     description: 有效输入能成功注册
+#     test: "注册请求 → 201 Created → 返回 user_id 和 token"
+#   - id: AC002
+#     description: 用户名重复返回错误
+#     test: "重复用户名 → 409 Conflict → 错误码 USER_EXISTS"

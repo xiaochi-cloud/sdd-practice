@@ -1,0 +1,67 @@
+graph TB
+    subgraph UserLayer["👥 用户层"]
+        U1[Java 开发者]
+        U2[Python 开发者]
+        U3[前端开发者]
+        U4[团队管理者]
+    end
+
+    subgraph InterfaceLayer["💻 交互层"]
+        I1[Qoder IDE<br/>桌面应用]
+        I2[JetBrains 插件]
+        I3[VS Code 插件]
+        I4[CLI 工具]
+    end
+
+    subgraph CoreEngine["⚙️ 核心引擎层"]
+        C1[Quest Mode 引擎]
+        C2[Spec 驱动引擎]
+        C3[意图识别]
+        C4[需求澄清]
+        C5[Spec 生成]
+        C6[任务规划]
+        C7[代码生成]
+        C8[质量验证]
+    end
+
+    subgraph AILayer["🤖 AI 模型层"]
+        A1[Claude 3.5<br/>自主编程]
+        A2[GPT-4.5<br/>复杂推理]
+        A3[Qwen 2.5<br/>中文优化]
+        A4[CodeLlama<br/>代码专用]
+    end
+
+    subgraph ExecLayer["🚀 执行环境层"]
+        E1[Local<br/>快速反馈]
+        E2[Parallel<br/>隔离安全]
+        E3[Remote<br/>云端执行]
+        E4[Sandbox<br/>沙箱环境]
+    end
+
+    subgraph IntegrationLayer["🔌 工具集成层"]
+        T1[Skills<br/>技能扩展]
+        T2[MCP<br/>协议集成]
+        T3[CI/CD<br/>持续集成]
+    end
+
+    subgraph DataLayer["💾 数据层"]
+        D1[Spec 规范存储]
+        D2[代码仓库]
+        D3[知识库]
+        D4[日志与监控]
+    end
+
+    UserLayer --> InterfaceLayer
+    InterfaceLayer --> CoreEngine
+    CoreEngine --> AILayer
+    AILayer --> ExecLayer
+    ExecLayer --> IntegrationLayer
+    IntegrationLayer --> DataLayer
+
+    style UserLayer fill:#e1f5ff
+    style InterfaceLayer fill:#fff4e1
+    style CoreEngine fill:#f0e1ff
+    style AILayer fill:#ffe1e1
+    style ExecLayer fill:#e1ffe1
+    style IntegrationLayer fill:#fff9e1
+    style DataLayer fill:#ffe1f0

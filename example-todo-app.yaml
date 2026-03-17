@@ -1,0 +1,558 @@
+# OpenSpec v1.0 - 待办事项管理应用
+# 这是一个完整的 SDD 示例项目规范
+
+meta:
+  name: Todo App
+  version: 1.0.0
+  description: 个人待办事项管理应用，支持创建、编辑、删除、完成待办
+  author: 池少
+  created_at: 2026-03-11
+  language: zh-CN
+
+# ==================== 功能规范 ====================
+
+spec:
+  functions:
+    # 功能 1: 创建待办
+    - id: F001
+      name: 创建待办事项
+      description: |
+        用户可以创建新的待办事项
+        支持设置标题、描述、截止日期、优先级
+      priority: high
+      
+      parameters:
+        - name: title
+          type: string
+          min_length: 1
+          max_length: 200
+          required: true
+          description: 待办事项标题
+          
+        - name: description
+          type: string
+          max_length: 1000
+          required: false
+          description: 详细描述
+          
+        - name: due_date
+          type: date
+          format: YYYY-MM-DD
+          required: false
+          description: 截止日期
+          
+        - name: priority
+          type: enum
+          values: [low, medium, high]
+          default: medium
+          required: false
+          description: 优先级
+      
+      returns:
+        - name: todo_id
+          type: string
+          format: uuid
+          description: 创建的待办 ID
+          
+        - name: created_at
+          type: datetime
+          description: 创建时间
+      
+      errors:
+        - code: INVALID_TITLE
+          description: 标题无效
+          http_status: 400
+        - code: INVALID_DATE
+          description: 截止日期无效
+          http_status: 400
+        - code: TITLE_TOO_LONG
+          description: 标题超长
+          http_status: 400
+      
+      constraints:
+        - 标题不能为空或空白
+        - 标题长度不超过 200 字符
+        - 截止日期不能是过去
+        - 优先级默认中等
+      
+      business_rules:
+        - R001: 同一天不能有重复标题的待办
+        - R002: 高优先级待办需要提醒
+      
+      acceptance_criteria:
+        - 有效输入能成功创建待办
+        - 返回待办 ID 和创建时间
+        - 标题为空返回明确错误
+        - 截止日期为过去返回明确错误
+    
+    # 功能 2: 完成待办
+    - id: F002
+      name: 完成待办事项
+      description: 标记待办事项为已完成
+      priority: high
+      
+      parameters:
+        - name: todo_id
+          type: string
+          format: uuid
+          required: true
+          description: 待办 ID
+      
+      returns:
+        - name: success
+          type: boolean
+          description: 是否成功
+      
+      errors:
+        - code: ALREADY_COMPLETED
+          description: 待办已完成
+          http_status: 400
+        - code: NOT_FOUND
+          description: 待办不存在
+          http_status: 404
+      
+      constraints:
+        - 只能完成状态为 pending 的待办
+        - 已完成的待办不能重复完成
+      
+      business_rules:
+        - R003: 完成待办时记录完成时间
+        - R004: 完成高优先级待办发送通知
+      
+      acceptance_criteria:
+        - 有效 ID 能成功标记完成
+        - 已完成待办返回错误
+        - 不存在的 ID 返回错误
+    
+    # 功能 3: 删除待办
+    - id: F003
+      name: 删除待办事项
+      description: 删除待办事项（软删除）
+      priority: medium
+      
+      parameters:
+        - name: todo_id
+          type: string
+          format: uuid
+          required: true
+      
+      returns:
+        - name: success
+          type: boolean
+      
+      errors:
+        - code: NOT_FOUND
+          description: 待办不存在
+          http_status: 404
+        - code: ALREADY_DELETED
+          description: 待办已删除
+          http_status: 400
+      
+      constraints:
+        - 只能删除未删除的待办
+        - 删除后数据保留 30 天
+      
+      business_rules:
+        - R005: 删除操作可撤销（30 天内）
+      
+      acceptance_criteria:
+        - 有效 ID 能成功删除
+        - 删除后可在回收站查看
+        - 30 天后永久删除
+    
+    # 功能 4: 列表查询
+    - id: F004
+      name: 查询待办列表
+      description: 按条件查询待办事项
+      priority: high
+      
+      parameters:
+        - name: status
+          type: enum
+          values: [all, pending, completed, cancelled]
+          default: pending
+          required: false
+        
+        - name: priority
+          type: enum
+          values: [low, medium, high]
+          required: false
+        
+        - name: date_range
+          type: object
+          properties:
+            start: date
+            end: date
+          required: false
+        
+        - name: page
+          type: integer
+          default: 1
+          required: false
+        
+        - name: page_size
+          type: integer
+          default: 20
+          min: 1
+          max: 100
+          required: false
+      
+      returns:
+        - name: todos
+          type: array
+          items: Todo
+        
+        - name: total
+          type: integer
+          description: 总数
+        
+        - name: page
+          type: integer
+          description: 当前页
+        
+        - name: page_size
+          type: integer
+          description: 每页数量
+      
+      errors:
+        - code: INVALID_PAGE
+          description: 页码无效
+          http_status: 400
+        - code: INVALID_PAGE_SIZE
+          description: 每页数量无效
+          http_status: 400
+      
+      acceptance_criteria:
+        - 能按条件筛选
+        - 支持分页
+        - 返回总数
+  
+  # ==================== 数据模型 ====================
+  
+  models:
+    - name: Todo
+      description: 待办事项模型
+      table: todos
+      
+      fields:
+        - name: id
+          type: string
+          format: uuid
+          primary_key: true
+          description: 待办 ID
+        
+        - name: title
+          type: string
+          max_length: 200
+          required: true
+          description: 标题
+        
+        - name: description
+          type: string
+          max_length: 1000
+          required: false
+          description: 描述
+        
+        - name: status
+          type: enum
+          values: [pending, completed, cancelled]
+          default: pending
+          required: true
+          description: 状态
+        
+        - name: priority
+          type: enum
+          values: [low, medium, high]
+          default: medium
+          required: true
+          description: 优先级
+        
+        - name: due_date
+          type: date
+          required: false
+          description: 截止日期
+        
+        - name: completed_at
+          type: datetime
+          required: false
+          description: 完成时间
+        
+        - name: created_at
+          type: datetime
+          default: now()
+          required: true
+          description: 创建时间
+        
+        - name: updated_at
+          type: datetime
+          default: now()
+          required: true
+          description: 更新时间
+        
+        - name: deleted_at
+          type: datetime
+          required: false
+          description: 删除时间（软删除）
+      
+      indexes:
+        - name: idx_status
+          fields: [status]
+        
+        - name: idx_priority
+          fields: [priority]
+        
+        - name: idx_due_date
+          fields: [due_date]
+        
+        - name: idx_created_at
+          fields: [created_at]
+      
+      constraints:
+        - title 不能为空
+        - status 默认 pending
+        - completed_at 仅在 status=completed 时有值
+  
+  # ==================== API 规范 ====================
+  
+  apis:
+    # API 1: 创建待办
+    - path: /api/v1/todos
+      method: POST
+      name: 创建待办
+      description: 创建新的待办事项
+      
+      request:
+        content_type: application/json
+        body:
+          title:
+            type: string
+            required: true
+          description:
+            type: string
+            required: false
+          due_date:
+            type: string
+            format: date
+            required: false
+          priority:
+            type: string
+            enum: [low, medium, high]
+            default: medium
+      
+      response:
+        success:
+          status: 201
+          body:
+            todo_id: string
+            created_at: datetime
+        
+        error:
+          status: 400
+          body:
+            error: string
+            message: string
+            details: object
+      
+      errors:
+        - code: INVALID_TITLE
+          message: 标题无效
+          http_status: 400
+        
+        - code: INVALID_DATE
+          message: 截止日期无效
+          http_status: 400
+    
+    # API 2: 获取待办详情
+    - path: /api/v1/todos/{id}
+      method: GET
+      name: 获取待办详情
+      description: 根据 ID 获取待办详情
+      
+      path_params:
+        id:
+          type: string
+          format: uuid
+          required: true
+      
+      response:
+        success:
+          status: 200
+          body:
+            todo: Todo
+        
+        error:
+          status: 404
+          body:
+            error: NOT_FOUND
+            message: 待办不存在
+    
+    # API 3: 完成待办
+    - path: /api/v1/todos/{id}/complete
+      method: POST
+      name: 完成待办
+      description: 标记待办为已完成
+      
+      path_params:
+        id:
+          type: string
+          format: uuid
+          required: true
+      
+      response:
+        success:
+          status: 200
+          body:
+            success: true
+            completed_at: datetime
+        
+        error:
+          status: 400
+          body:
+            error: string
+            message: string
+      
+      errors:
+        - code: ALREADY_COMPLETED
+          message: 待办已完成
+          http_status: 400
+        
+        - code: NOT_FOUND
+          message: 待办不存在
+          http_status: 404
+    
+    # API 4: 删除待办
+    - path: /api/v1/todos/{id}
+      method: DELETE
+      name: 删除待办
+      description: 软删除待办
+      
+      path_params:
+        id:
+          type: string
+          format: uuid
+          required: true
+      
+      response:
+        success:
+          status: 200
+          body:
+            success: true
+        
+        error:
+          status: 404
+          body:
+            error: NOT_FOUND
+            message: 待办不存在
+    
+    # API 5: 查询列表
+    - path: /api/v1/todos
+      method: GET
+      name: 查询待办列表
+      description: 按条件查询待办列表
+      
+      query_params:
+        status:
+          type: string
+          enum: [all, pending, completed, cancelled]
+          default: pending
+        
+        priority:
+          type: string
+          enum: [low, medium, high]
+        
+        page:
+          type: integer
+          default: 1
+        
+        page_size:
+          type: integer
+          default: 20
+          max: 100
+      
+      response:
+        success:
+          status: 200
+          body:
+            todos:
+              type: array
+              items: Todo
+            pagination:
+              total: integer
+              page: integer
+              page_size: integer
+              total_pages: integer
+  
+  # ==================== 测试规范 ====================
+  
+  tests:
+    # 单元测试
+    unit_tests:
+      - name: test_create_todo
+        feature: F001
+        cases:
+          - name: 成功创建待办
+            input:
+              title: 测试待办
+              description: 测试描述
+            expected:
+              success: true
+              todo_id: exists
+          
+          - name: 标题为空失败
+            input:
+              title: ""
+            expected:
+              success: false
+              error: INVALID_TITLE
+          
+          - name: 标题超长失败
+            input:
+              title: "a" * 201
+            expected:
+              success: false
+              error: TITLE_TOO_LONG
+      
+      - name: test_complete_todo
+        feature: F002
+        cases:
+          - name: 成功完成待办
+            setup:
+              - create_todo(status: pending)
+            action:
+              complete: todo_id
+            expected:
+              success: true
+              status: completed
+          
+          - name: 重复完成失败
+            setup:
+              - create_todo(status: completed)
+            action:
+              complete: todo_id
+            expected:
+              success: false
+              error: ALREADY_COMPLETED
+    
+    # 集成测试
+    integration_tests:
+      - name: test_todo_lifecycle
+        description: 测试待办完整生命周期
+        steps:
+          - action: create_todo
+            input:
+              title: 生命周期测试
+              priority: high
+            expect:
+              status: pending
+          
+          - action: get_todo
+            expect:
+              status: pending
+          
+          - action: complete_todo
+            expect:
+              status: completed
+          
+          - action: delete_todo
+            expect:
+              status: deleted
