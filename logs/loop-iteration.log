@@ -42,3 +42,8 @@
  create mode 100644 best-practices/guides/sdd-quick-start.md
 ✅ 提交完成 #7
 📝 迭代 8: best-practices/pitfalls/top-10-mistakes.md
+[main fc6c2b6] feat: 迭代 top-10-mistakes.md (持续迭代 #8)
+ 2 files changed, 19 insertions(+)
+ create mode 100644 best-practices/pitfalls/top-10-mistakes.md
+✅ 提交完成 #8
+📝 迭代 9: tools/qoder/setup-guide.md
