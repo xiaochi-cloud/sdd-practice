@@ -10,3 +10,4 @@
  2 files changed, 10 insertions(+)
  create mode 100644 examples/user-management/src/main/java/com/sdd/user/User.java
 ✅ 提交完成 #1
+📝 迭代 2: examples/user-management/src/main/java/com/sdd/user/CreateUserRequest.java
