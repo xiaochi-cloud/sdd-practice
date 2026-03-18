@@ -1,0 +1,11 @@
+name: 模板名称
+version: 1.0.0
+description: 模板描述
+
+fields:
+  - name: 字段 1
+    type: string
+    required: true
+  - name: 字段 2
+    type: string
+    required: false
