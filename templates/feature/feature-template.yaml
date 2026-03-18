@@ -1,0 +1,8 @@
+name: 模板
+version: 1.0.0
+description: SDD 规范模板
+
+fields:
+  - name: 字段
+    type: string
+    required: true
