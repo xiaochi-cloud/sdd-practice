@@ -105,7 +105,7 @@ main() {
     setup_git
     
     # 检查变更
-    local changes=$(check_changes)
+    local changes=$(check_changes 2>/dev/null)
     
     if [ "$changes" -gt 0 ]; then
         log "📝 检测到变更，开始提交流程..."
