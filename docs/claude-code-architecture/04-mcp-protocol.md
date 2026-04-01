@@ -82,3 +82,105 @@ interface Service {
 ---
 
 **文档持续迭代中...**
+
+---
+
+## 💡 设计模式
+
+### 1. 观察者模式
+
+用于服务状态变更通知：
+
+```typescript
+class ServiceObserver {
+  private observers: Set<Function> = new Set();
+  
+  subscribe(callback: Function): void {
+    this.observers.add(callback);
+  }
+  
+  notify(event: ServiceEvent): void {
+    for (const callback of this.observers) {
+      callback(event);
+    }
+  }
+}
+```
+
+### 2. 工厂模式
+
+用于创建不同的服务连接器：
+
+```typescript
+class ServiceFactory {
+  createService(type: string): Service {
+    switch(type) {
+      case 'github': return new GitHubService();
+      case 'jira': return new JiraService();
+      case 'confluence': return new ConfluenceService();
+      default: throw new Error('Unknown service type');
+    }
+  }
+}
+```
+
+---
+
+## 📊 性能优化
+
+### 1. 连接池
+
+```typescript
+class ConnectionPool {
+  private pool: Map<string, Connection[]> = new Map();
+  private maxSize = 10;
+  
+  async getConnection(serviceId: string): Promise<Connection> {
+    const connections = this.pool.get(serviceId) || [];
+    
+    if (connections.length > 0) {
+      return connections.pop()!;
+    }
+    
+    return this.createConnection(serviceId);
+  }
+  
+  releaseConnection(serviceId: string, conn: Connection): void {
+    if (!this.pool.has(serviceId)) {
+      this.pool.set(serviceId, []);
+    }
+    this.pool.get(serviceId)!.push(conn);
+  }
+}
+```
+
+---
+
+## 🔒 安全考虑
+
+### 1. 认证管理
+
+- 使用 OAuth 2.0
+- Token 加密存储
+- 定期刷新 Token
+
+### 2. 权限控制
+
+- 最小权限原则
+- 细粒度权限
+- 审计日志
+
+---
+
+## 🔗 相关文档
+
+- [00-overview.md](./00-overview.md) - 架构总览
+- [01-agent-core.md](./01-agent-core.md) - Agent 核心
+- [02-tool-system.md](./02-tool-system.md) - 工具系统
+
+---
+
+**文档持续完善中...** 🚀
+
+**最后更新：** 2026-04-01  
+**维护者：** 池少团队
