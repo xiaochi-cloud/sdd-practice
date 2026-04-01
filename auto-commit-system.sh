@@ -107,7 +107,7 @@ main() {
     # 检查变更
     local changes=$(check_changes)
     
-    if [ $changes -gt 0 ]; then
+    if [ "$changes" -gt 0 ]; then
         log "📝 检测到变更，开始提交流程..."
         
         # 尝试提交（最多重试 3 次）
