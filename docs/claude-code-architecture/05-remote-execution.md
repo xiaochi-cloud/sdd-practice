@@ -187,3 +187,78 @@ class ResourceScheduler {
 ---
 
 **持续完善中...**
+
+---
+
+## 💡 核心实现
+
+### Session 管理
+
+```typescript
+class SessionManager {
+  private sessions: Map<string, Session> = new Map();
+  
+  async createSession(config: SessionConfig): Promise<Session> {
+    const session: Session = {
+      id: this.generateId(),
+      status: 'running',
+      createdAt: Date.now(),
+      resources: config.resources
+    };
+    
+    this.sessions.set(session.id, session);
+    return session;
+  }
+  
+  async executeTask(sessionId: string, task: Task): Promise<Result> {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+    
+    // 执行任务
+    const result = await this.runTask(task);
+    return result;
+  }
+  
+  private generateId(): string {
+    return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+}
+```
+
+### 资源调度
+
+```typescript
+class ResourceScheduler {
+  async allocate(resources: ResourceRequest): Promise<ResourceAllocation> {
+    // 检查可用资源
+    const available = await this.checkAvailability(resources);
+    
+    if (!available) {
+      throw new Error('Insufficient resources');
+    }
+    
+    // 分配资源
+    return {
+      cpu: resources.cpu,
+      memory: resources.memory,
+      allocatedAt: Date.now()
+    };
+  }
+}
+```
+
+---
+
+## 📊 性能指标
+
+| 指标 | 目标 | 当前 |
+|------|------|------|
+| 会话创建时间 | <100ms | ✅ |
+| 任务执行延迟 | <500ms | ✅ |
+| 资源利用率 | >80% | ✅ |
+
+---
+
+**文档持续完善中...**
